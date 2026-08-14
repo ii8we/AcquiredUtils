@@ -1,0 +1,79 @@
+plugins {
+	id 'fabric-loom' version '1.14.4'
+	id 'maven-publish'
+}
+
+version = project.mod_version
+group = project.maven_group
+
+base {
+	archivesName = project.archives_base_name
+}
+
+repositories {
+	// Fabric/Mojang/Maven Central are added automatically by the Loom plugin.
+	// Add extra repos here only if a dependency needs one (e.g. a mod hosted on a
+	// third-party maven such as Modrinth's or CurseMaven).
+}
+
+loom {
+	// Minecraft 1.21.11 dropped Yarn/Intermediary in favor of shipping unobfuscated
+	// jars with official Mojang mappings — there is no separate "mappings" dependency
+	// to declare anymore (no `net.fabricmc:yarn:...`). This is the new convention as of
+	// the 1.21.11 toolchain change; confirm current syntax against Loom 1.14 docs if
+	// `./gradlew build` complains here.
+	splitEnvironmentSourceSets()
+
+	mods {
+		acquiredutils {
+			sourceSet sourceSets.main
+			sourceSet sourceSets.client
+		}
+	}
+	accessWidenerPath = file("src/main/resources/acquiredutils.accesswidener")
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+	// Official Mojang mappings, unobfuscated as of 1.21.11 — no Yarn/mappings() call needed.
+	mappings loom.officialMojangMappings()
+
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+}
+
+processResources {
+	inputs.property "version", project.version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": project.version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 21
+}
+
+java {
+	withSourcesJar()
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
+}
+
+jar {
+	from("LICENSE") {
+		rename { "${it}_${base.archivesName.get()}" }
+	}
+}
+
+publishing {
+	publications {
+		create("mavenJava", MavenPublication) {
+			artifactId project.archives_base_name
+			from components.java
+		}
+	}
+	repositories {
+		// Add your deployment repo here, e.g. GitHub Packages.
+	}
+}
