@@ -17,9 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public final class ContainerOverlayHandler {
 
@@ -53,22 +51,17 @@ public final class ContainerOverlayHandler {
         int leftPos = screen.leftPos;
         int topPos = screen.topPos;
 
-        List<Slot> recipeHighlighted = RecipeUnlockHighlightHandler.renderBackgrounds(
-            graphics,
-            screen,
-            player,
-            leftPos,
-            topPos
-        );
-
-        List<Slot> rarityHighlighted = RarityHighlightHandler.renderOverlay(
+        List<Slot> rarityHighlighted = RarityHighlightHandler.renderBackgrounds(
             graphics, screen, player, leftPos, topPos
         );
+        for (Slot slot : rarityHighlighted) {
+            renderSlotItem(graphics, slot, leftPos, topPos);
+        }
 
-        Set<Slot> redraw = new LinkedHashSet<>();
-        redraw.addAll(recipeHighlighted);
-        redraw.addAll(rarityHighlighted);
-        for (Slot slot : redraw) {
+        List<Slot> recipeHighlighted = RecipeUnlockHighlightHandler.renderBackgrounds(
+            graphics, screen, player, leftPos, topPos
+        );
+        for (Slot slot : recipeHighlighted) {
             renderSlotItem(graphics, slot, leftPos, topPos);
         }
 

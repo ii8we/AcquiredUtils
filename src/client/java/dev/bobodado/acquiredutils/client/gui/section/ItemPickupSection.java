@@ -4,8 +4,8 @@ import dev.bobodado.acquiredutils.client.gui.AcquiredUtilsConfigScreen;
 import dev.bobodado.acquiredutils.client.gui.PickupHudEditorScreen;
 import dev.bobodado.acquiredutils.client.gui.widget.ThemedButtonWidget;
 import dev.bobodado.acquiredutils.client.gui.widget.ValueSliderWidget;
-import dev.bobodado.acquiredutils.client.gui.widget.ThemedCheckboxWidget;
 import dev.bobodado.acquiredutils.config.AcquiredUtilsConfig;
+import dev.bobodado.acquiredutils.client.gui.widget.ThemedCheckboxWidget;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class ItemPickupSection extends ModSection {
                 "acquiredutils.gui.desc.item_pickup_notifier",
                 22, 20, 20, 48,
                 (x, y, w, h) -> new ThemedCheckboxWidget(
-                    x + w - s(24), y + s(2), s(20), s(18),
+                    x + w - s(24), y + s(2), s(20), s(20),
                     () -> cfg.itemPickupNotifierEnabled,
                     checked -> { cfg.itemPickupNotifierEnabled = checked; cfg.markDirty(); }
                 )
@@ -74,6 +74,5 @@ public class ItemPickupSection extends ModSection {
             )
         );
     }
-
 
 }

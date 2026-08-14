@@ -1,17 +1,28 @@
 package dev.bobodado.acquiredutils.client.gui.widget;
 
 import dev.bobodado.acquiredutils.client.gui.theme.Theme;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 
-import java.util.function.Consumer;
 import java.util.function.BooleanSupplier;
+import java.util.function.Consumer;
 
+/** Compact themed checkbox matching the Slot Lock control. */
 public final class ThemedCheckboxWidget extends AbstractWidget {
+    private static final int SIZE = 12;
+    private static final Identifier CHECKED = Identifier.fromNamespaceAndPath(
+        "acquiredutils", "textures/gui/checkbox_purple_checked.png"
+    );
+    private static final Identifier UNCHECKED = Identifier.fromNamespaceAndPath(
+        "acquiredutils", "textures/gui/checkbox_purple_unchecked.png"
+    );
 
     private final BooleanSupplier getter;
     private final Consumer<Boolean> setter;
@@ -25,26 +36,15 @@ public final class ThemedCheckboxWidget extends AbstractWidget {
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float partialTick) {
-        Theme theme = Theme.current();
-        int size = Math.min(12, Math.max(10, height - 4));
+        int size = Math.min(SIZE, Math.min(width, height));
         int x = getX() + (width - size) / 2;
-        int y = getY() + (height - size) / 2 - 2;
+        int y = getY() + (height - size) / 2;
+        Identifier texture = getter.getAsBoolean() ? CHECKED : UNCHECKED;
 
-        int fill = getter.getAsBoolean() ? theme.accent : theme.footerBottom;
-        int border = isHovered() ? theme.accentBright : theme.frameMid;
+        graphics.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, size, size, SIZE, SIZE);
 
-        graphics.fill(x, y, x + size, y + size, fill);
-        graphics.renderOutline(x, y, size, size, border);
-
-        if (getter.getAsBoolean()) {
-            graphics.drawString(
-                net.minecraft.client.Minecraft.getInstance().font,
-                Component.literal("✓"),
-                x + 2,
-                y + 1,
-                theme.text,
-                false
-            );
+        if (isHovered()) {
+            graphics.renderOutline(x - 1, y - 1, size + 2, size + 2, Theme.current().accentBright);
         }
     }
 
@@ -55,6 +55,6 @@ public final class ThemedCheckboxWidget extends AbstractWidget {
 
     @Override
     public void updateWidgetNarration(NarrationElementOutput output) {
-        output.add(NarratedElementType.TITLE, Component.translatable("acquiredutils.gui.checkbox.toggle"));
+        output.add(NarratedElementType.TITLE, Component.literal(getter.getAsBoolean() ? "Enabled" : "Disabled"));
     }
 }

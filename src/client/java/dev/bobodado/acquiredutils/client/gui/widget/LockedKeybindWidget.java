@@ -116,6 +116,18 @@ public class LockedKeybindWidget extends AbstractWidget implements KeyListenerSl
             );
         }
 
+        int labelX = cbX + cbSize + 9;
+        int labelY = getY() + (height - 8) / 2;
+
+        graphics.drawString(
+            font,
+            getMessage(),
+            labelX,
+            labelY,
+            theme.text,
+            false
+        );
+
         int keyBoxW = KEY_BOX_WIDTH;
         int keyBoxX = getX() + width - keyBoxW - KEY_BOX_RIGHT_GAP;
         int keyCode = keyGetter.getAsInt();

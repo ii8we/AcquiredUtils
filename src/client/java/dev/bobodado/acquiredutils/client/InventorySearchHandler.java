@@ -7,9 +7,11 @@ import net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.Locale;
@@ -24,7 +26,7 @@ public final class InventorySearchHandler {
 
     public static void init() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (!(screen instanceof InventoryScreen inventoryScreen)) {
+            if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
                 return;
             }
 
@@ -69,14 +71,14 @@ public final class InventorySearchHandler {
 
             ScreenEvents.afterRender(screen).register(
                 (s, graphics, mouseX, mouseY, partialTick) ->
-                    render(graphics, inventoryScreen)
+                    render(graphics, containerScreen)
             );
         });
     }
 
     private static void render(
         GuiGraphics graphics,
-        InventoryScreen screen
+        AbstractContainerScreen<?> screen
     ) {
         Minecraft mc = Minecraft.getInstance();
         Player player = mc.player;
@@ -107,32 +109,36 @@ public final class InventorySearchHandler {
         String normalized = query.toLowerCase(Locale.ROOT);
 
         for (Slot slot : screen.getMenu().slots) {
-            if (slot.container != player.getInventory() || !slot.hasItem()) {
+            if (!slot.isActive() || !slot.hasItem() || normalized.isEmpty()) {
                 continue;
             }
 
-            if (!normalized.isEmpty()
-                && slot.getItem().getHoverName().getString().toLowerCase(Locale.ROOT).contains(normalized)) {
+            ItemStack stack = slot.getItem();
+            if (!matches(stack, player, normalized)) {
+                continue;
+            }
 
-                int sx = screen.leftPos + slot.x;
-                int sy = screen.topPos + slot.y;
+            int sx = screen.leftPos + slot.x;
+            int sy = screen.topPos + slot.y;
 
-                graphics.fill(
-                    sx,
-                    sy,
-                    sx + 16,
-                    sy + 16,
-                    0x3D9A6CFF
-                );
-                graphics.renderOutline(
-                    sx,
-                    sy,
-                    16,
-                    16,
-                    0xFFBFA4FF
-                );
+            graphics.fill(sx, sy, sx + 16, sy + 16, 0x3D9A6CFF);
+            graphics.renderOutline(sx, sy, 16, 16, 0xFFBFA4FF);
+        }
+    }
+
+    private static boolean matches(ItemStack stack, Player player, String normalized) {
+        if (stack.getHoverName().getString().toLowerCase(Locale.ROOT).contains(normalized)) {
+            return true;
+        }
+
+        for (Component line : stack.getTooltipLines(
+            Item.TooltipContext.of(player.level()), player, TooltipFlag.Default.NORMAL)) {
+            if (line.getString().toLowerCase(Locale.ROOT).contains(normalized)) {
+                return true;
             }
         }
+
+        return false;
     }
 
     private static char toCharacter(int keyCode) {

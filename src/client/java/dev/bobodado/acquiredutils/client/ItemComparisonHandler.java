@@ -93,10 +93,17 @@ public final class ItemComparisonHandler {
         int screenW = mc.getWindow().getGuiScaledWidth();
         int screenH = mc.getWindow().getGuiScaledHeight();
 
-        int panelX = 8;
-        int panelY = mouseY - panelH / 2;
+        // Keep the comparison HUD on the left of the cursor so it does not
+        // cover the item tooltip or the hovered slot.
+        int panelX = mouseX - panelW - 12;
+        int panelY = mouseY + 12 + Math.min(tooltipLineCount * 9, 90);
 
-        panelY = Math.max(8, Math.min(screenH - panelH - 8, panelY));
+        if (panelX < 4) {
+            panelX = 4;
+        }
+        if (panelY + panelH > screenH) {
+            panelY = screenH - panelH - 4;
+        }
 
         graphics.fill(panelX, panelY, panelX + panelW, panelY + panelH, 0xE60B0712);
         graphics.renderOutline(panelX, panelY, panelW, panelH, 0xFF7C5C9E);
@@ -140,12 +147,11 @@ public final class ItemComparisonHandler {
                 continue;
             }
 
-            String statName = matcher.group(1).trim();
-            if (statName.equalsIgnoreCase("Mana Cost")) {
-                continue;
-            }
-
             try {
+                String statName = matcher.group(1).trim();
+                if (statName.toLowerCase(java.util.Locale.ROOT).contains("mana cost")) {
+                    continue;
+                }
                 result.put(
                     statName,
                     Double.parseDouble(matcher.group(2))

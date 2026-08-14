@@ -85,7 +85,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
 
     private static final int ROW_HEIGHT_BASE = 62;
     private static final int ROW_GAP_BASE = 8;
-    private static final int CONTENT_TOP_BASE = 34;
+    private static final int CONTENT_TOP_BASE = 36;
 
     public AcquiredUtilsConfigScreen(Screen parent) {
         super(Component.translatable("acquiredutils.gui.title"));
@@ -193,7 +193,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
         int width = s(SEARCH_WIDTH_BASE);
         int height = s(SEARCH_HEIGHT_BASE);
         int x = contentX + contentW - width - s(4);
-        int y = contentY + s(3);
+        int y = contentY + s(6);
 
         searchBox = new EditBox(
             this.font,
@@ -206,13 +206,14 @@ public class AcquiredUtilsConfigScreen extends Screen {
         searchBox.setMaxLength(80);
         searchBox.setBordered(true);
         searchBox.setTextColor(0xFFF2EAF7);
-        searchBox.setSuggestion("Search settings...");
+        searchBox.setSuggestion(searchQuery.isEmpty() ? "Search settings..." : null);
         searchBox.setHint(Component.translatable("acquiredutils.gui.search"));
         searchBox.setValue(searchQuery);
         searchBox.setResponder(value -> {
             String normalized = value.trim().toLowerCase(Locale.ROOT);
             if (!normalized.equals(searchQuery)) {
                 searchQuery = normalized;
+                searchBox.setSuggestion(normalized.isEmpty() ? "Search settings..." : null);
                 contentScroll = 0;
                 sidebarScroll = 0;
                 needsRebuild = true;
@@ -347,7 +348,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
         int rowHeight = s(ROW_HEIGHT_BASE);
         int rowGap = s(ROW_GAP_BASE);
         int contentTop = contentY + s(CONTENT_TOP_BASE);
-        int viewportHeight = Math.max(s(60), contentH - s(CONTENT_TOP_BASE));
+        int viewportHeight = contentH - s(CONTENT_TOP_BASE);
 
         int totalHeight = rows.isEmpty()
             ? 0
@@ -392,7 +393,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
                 controlH
             );
 
-            int viewportTop = contentTop;
+            int viewportTop = contentY + s(22);
             int viewportBottom = contentY + contentH;
             widget.visible = rowY + rowHeight > viewportTop
                 && rowY < viewportBottom;
@@ -569,10 +570,9 @@ public class AcquiredUtilsConfigScreen extends Screen {
             theme.divider
         );
 
-        int contentTop = contentY + s(CONTENT_TOP_BASE);
         graphics.enableScissor(
             contentX,
-            contentTop,
+            contentY,
             contentX + contentW,
             contentY + contentH
         );
@@ -588,9 +588,9 @@ public class AcquiredUtilsConfigScreen extends Screen {
                 mouseY,
                 partialTick,
                 contentX,
-                contentTop,
+                contentY,
                 Math.max(s(160), contentW - s(12)),
-                Math.max(s(60), contentH - s(CONTENT_TOP_BASE))
+                contentH
             );
         }
 
@@ -598,14 +598,31 @@ public class AcquiredUtilsConfigScreen extends Screen {
 
         drawScrollbars(graphics, theme, contentX, contentY, contentW, contentH);
 
+        // Content widgets are rendered separately under the viewport scissor.
+        // This prevents buttons/sliders/dropdowns from leaking outside the
+        // scrollable area when the user scrolls up or down.
+        List<Boolean> contentVisibility = new ArrayList<>(sectionWidgets.size());
+        for (AbstractWidget widget : sectionWidgets) {
+            contentVisibility.add(widget.visible);
+            widget.visible = false;
+        }
         super.render(graphics, mouseX, mouseY, partialTick);
+        for (int i = 0; i < sectionWidgets.size(); i++) {
+            sectionWidgets.get(i).visible = contentVisibility.get(i);
+        }
 
         graphics.enableScissor(
             contentX,
-            contentTop,
+            contentY,
             contentX + contentW,
             contentY + contentH
         );
+
+        for (AbstractWidget widget : sectionWidgets) {
+            if (widget.visible) {
+                widget.render(graphics, mouseX, mouseY, partialTick);
+            }
+        }
 
         for (StoredText st : storedTexts) {
             if (st.isLabel()) {
@@ -633,7 +650,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
                 this.font,
                 Component.translatable("acquiredutils.gui.search.no_results"),
                 contentX + s(16),
-                contentTop + s(16),
+                contentY + s(46),
                 theme.credit,
                 false
             );
@@ -693,8 +710,8 @@ public class AcquiredUtilsConfigScreen extends Screen {
         if (maxContentScroll > 0) {
             int gutter = s(12);
             int trackX = contentX + contentW - gutter / 2 - barWidth / 2;
-            int trackY = contentY;
-            int trackH = Math.max(s(20), contentH - s(CONTENT_TOP_BASE) - s(4));
+            int trackY = contentY + s(28);
+            int trackH = contentH - s(34);
 
             graphics.fill(
                 trackX,

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "id": "acquiredutils",
-  "version": "${version}",
+  "version": "1.0.0",
   "name": "AcquiredUtils",
   "description": "Utility mod with an in-game settings GUI.",
   "authors": [

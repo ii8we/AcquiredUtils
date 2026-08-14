@@ -6,6 +6,9 @@ import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public final class RarityHighlightHandler {
 
     private RarityHighlightHandler() {
@@ -15,7 +18,7 @@ public final class RarityHighlightHandler {
         // Rendering is coordinated by ContainerOverlayHandler.
     }
 
-    public static java.util.List<Slot> renderOverlay(
+    public static List<Slot> renderBackgrounds(
         GuiGraphics graphics,
         AbstractContainerScreen<?> screen,
         Player player,
@@ -24,12 +27,12 @@ public final class RarityHighlightHandler {
     ) {
         AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
 
+        List<Slot> highlighted = new ArrayList<>();
         if (player == null || !cfg.rarityCircleEnabled) {
-            return new java.util.ArrayList<>();
+            return highlighted;
         }
         int radius = Math.max(3, Math.min(8, Math.round(cfg.rarityCircleSize)));
-        int alpha = Math.max(0, Math.min(255, Math.round(cfg.rarityCircleOpacity * 150.0f)));
-        java.util.List<Slot> highlighted = new java.util.ArrayList<>();
+        int alpha = Math.max(0, Math.min(255, Math.round(cfg.rarityCircleOpacity * 255.0f)));
 
         for (Slot slot : screen.getMenu().slots) {
             if (!slot.isActive() || slot.getItem().isEmpty()) {
@@ -63,16 +66,14 @@ public final class RarityHighlightHandler {
         int centerX,
         int centerY,
         int color,
-        int radius,
+        int outerRadius,
         int alpha
     ) {
         int argb = (alpha << 24) | (color & 0x00FFFFFF);
 
-        for (int dy = -radius; dy <= radius; dy++) {
-            int width = (int) Math.floor(
-                Math.sqrt(radius * radius - dy * dy)
-            );
-
+        // Filled translucent disk; it is rendered before the item is redrawn.
+        for (int dy = -outerRadius; dy <= outerRadius; dy++) {
+            int width = (int) Math.floor(Math.sqrt(outerRadius * outerRadius - dy * dy));
             graphics.fill(
                 centerX - width,
                 centerY + dy,

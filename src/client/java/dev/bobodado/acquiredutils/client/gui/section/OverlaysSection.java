@@ -2,8 +2,8 @@ package dev.bobodado.acquiredutils.client.gui.section;
 
 import dev.bobodado.acquiredutils.client.gui.AcquiredUtilsConfigScreen;
 import dev.bobodado.acquiredutils.client.gui.widget.ValueSliderWidget;
-import dev.bobodado.acquiredutils.client.gui.widget.ThemedCheckboxWidget;
 import dev.bobodado.acquiredutils.config.AcquiredUtilsConfig;
+import dev.bobodado.acquiredutils.client.gui.widget.ThemedCheckboxWidget;
 import net.minecraft.network.chat.Component;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class OverlaysSection extends ModSection {
                 "acquiredutils.gui.desc.recipe_unlock_highlight",
                 22, 20, 20, 48,
                 (x, y, w, h) -> new ThemedCheckboxWidget(
-                    x + w - s(24), y + s(2), s(20), s(18),
+                    x + w - s(24), y + s(2), s(20), s(20),
                     () -> cfg.recipeUnlockHighlightEnabled,
                     checked -> { cfg.recipeUnlockHighlightEnabled = checked; cfg.markDirty(); }
                 )
@@ -44,7 +44,7 @@ public class OverlaysSection extends ModSection {
                 "acquiredutils.gui.desc.rarity_circle",
                 22, 20, 20, 48,
                 (x, y, w, h) -> new ThemedCheckboxWidget(
-                    x + w - s(24), y + s(2), s(20), s(18),
+                    x + w - s(24), y + s(2), s(20), s(20),
                     () -> cfg.rarityCircleEnabled,
                     checked -> { cfg.rarityCircleEnabled = checked; cfg.markDirty(); }
                 )
@@ -90,7 +90,7 @@ public class OverlaysSection extends ModSection {
                 "acquiredutils.gui.desc.item_comparison",
                 22, 20, 20, 48,
                 (x, y, w, h) -> new ThemedCheckboxWidget(
-                    x + w - s(24), y + s(2), s(20), s(18),
+                    x + w - s(24), y + s(2), s(20), s(20),
                     () -> cfg.itemComparisonEnabled,
                     checked -> { cfg.itemComparisonEnabled = checked; cfg.markDirty(); }
                 )
