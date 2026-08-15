@@ -93,6 +93,19 @@ public final class InventorySearchHandler {
                 (s, graphics, mouseX, mouseY, partialTick) ->
                     renderSearchTooltip(graphics, containerScreen, state, mouseX, mouseY)
             );
+
+            // While the search box has focus, the inventory-toggle key (E by
+            // default) belongs to text input instead of the container screen.
+            // Block only that one screen-level action so typing the letter
+            // "e" cannot close the inventory. The following character event
+            // still reaches EditBox and inserts the actual character.
+            net.fabricmc.fabric.api.client.screen.v1.ScreenKeyboardEvents.allowKeyPress(screen)
+                .register((s, event) -> {
+                    if (!state.editBox.isFocused()) {
+                        return true;
+                    }
+                    return !client.options.keyInventory.matches(event);
+                });
         });
     }
 

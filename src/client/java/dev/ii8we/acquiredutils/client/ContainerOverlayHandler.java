@@ -84,6 +84,11 @@ public final class ContainerOverlayHandler {
             }
         }
 
+        // Slot-lock is intentionally the only slot overlay drawn above the
+        // item itself. The tooltip is submitted immediately afterwards, so
+        // the item's description remains on top of the lock icon.
+        SlotLockHandler.renderIcons(graphics, locked, leftPos, topPos);
+
         ItemComparisonHandler.render(
             graphics,
             screen,

@@ -164,17 +164,35 @@ public final class SlotLockHandler {
             if (slot.container == mc.player.getInventory()
                 && slot.isActive()
                 && isLocked(slot.getContainerSlot())) {
-
-                drawPadlock(
-                    graphics,
-                    leftPos + slot.x,
-                    topPos + slot.y
-                );
                 highlighted.add(slot);
             }
         }
 
         return highlighted;
+    }
+
+    /**
+     * Draws locked-slot padlocks after item stacks and decorations have been
+     * rendered, but before the container tooltip is submitted. This keeps the
+     * lock icon visible over the item while the tooltip remains on top of it.
+     */
+    public static void renderIcons(
+        GuiGraphics graphics,
+        java.util.List<Slot> lockedSlots,
+        int leftPos,
+        int topPos
+    ) {
+        if (lockedSlots.isEmpty() || !AcquiredUtilsConfig.get().slotLockEnabled) {
+            return;
+        }
+
+        for (Slot slot : lockedSlots) {
+            drawPadlock(
+                graphics,
+                leftPos + slot.x,
+                topPos + slot.y
+            );
+        }
     }
 
     private static void toggleHoveredSlot(AbstractContainerScreen<?> screen) {
