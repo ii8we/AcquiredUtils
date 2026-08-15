@@ -27,36 +27,34 @@ AcquiredUtils does not add content to the server and does not require changes to
 ### Inventory & Item Management
 
 - Slot locking for protected inventory slots
-- Favorite item marking
 - Item comparison for supported equipment
 - Inventory item search and highlighting
 - Rarity indicators for custom items
 
-### Item Pickup Notifications
+### Pickup Alerts
 
-- Item pickup notifications
-- Rarity-aware notification colors
+- Pickup alerts
+- Rarity-aware alert colors
 - Duplicate pickup stacking
 - Item icons in notifications
 - Configurable notification duration
-- Custom HUD positioning
+- Custom alert positioning
 
-### Overlays
+### Highlights
 
-- Custom filled rarity circle indicators
-- Recipe unlock highlighting inside supported recipe vaults
-- Player inventory search highlighting
+- Rarity highlight indicators
+- Recipe unlock highlighting
+- Inventory search highlighting
 - Configurable visual overlays
 
 ### Configuration
 
 - Searchable settings
-- Menu scaling
+- Adjustable menu size
 - Scrollable settings sections
-- Themed feature checkboxes
-- Configurable rarity-circle size and opacity
-- HUD editor for notification positioning
-- Custom keybind configuration
+- Custom setting toggles
+- Alert position editor
+- Slot Lock key configuration
 
 ## Compatibility
 
@@ -67,7 +65,7 @@ AcquiredUtils is developed specifically for:
 - **Fabric Loader**
 - **Fabric API**
 
-The mod is intended to run on the client.
+The mod is intended for client-side gameplay features and keeps its client-only code in `src/client/java`.
 
 ## Installation
 
@@ -127,7 +125,7 @@ AcquiredUtils/
 └── src/
     ├── main/
     │   ├── java/
-    │   │   └── dev/bobodado/acquiredutils/
+    │   │   └── dev/ii8we/acquiredutils/
     │   │       ├── AcquiredUtils.java
     │   │       └── config/
     │   │           └── AcquiredUtilsConfig.java
@@ -141,11 +139,9 @@ AcquiredUtils/
     │           │   └── en_us.json
     │           └── textures/gui/
     │               ├── button_save.png
-    │               ├── checkbox_checked.png
-    │               ├── checkbox_purple_checked.png
+    │               ├──     │               ├── checkbox_purple_checked.png
     │               ├── checkbox_purple_unchecked.png
-    │               ├── checkbox_unchecked.png
-    │               ├── close_button.png
+    │               ├──     │               ├── close_button.png
     │               ├── dropdown_closed.png
     │               ├── dropdown_open_bg.png
     │               ├── dropdown_selection_highlight.png
@@ -164,7 +160,7 @@ AcquiredUtils/
     │
     └── client/
         └── java/
-            └── dev/bobodado/acquiredutils/client/
+            └── dev/ii8we/acquiredutils/client/
                 ├── AcquiredUtilsClient.java
                 ├── ContainerOverlayHandler.java
                 ├── InventorySearchHandler.java
@@ -181,7 +177,7 @@ AcquiredUtils/
                 │   │   ├── ItemPickupSection.java
                 │   │   ├── KeybindsSection.java
                 │   │   ├── ModSection.java
-                │   │   └── OverlaysSection.java
+                │   │   └── HighlightsSection.java
                 │   │
                 │   ├── theme/
                 │   │   └── Theme.java
@@ -207,12 +203,15 @@ AcquiredUtils/
 ### Source Set Overview
 
 - **`src/main/java`** — shared mod entrypoint and configuration.
-- **`src/client/java`** — client-only gameplay utilities, GUI, HUD, inventory features, and visual overlays.
+- **`src/client/java`** — client-only gameplay utilities, GUI, HUD, inventory features, and visual highlights.
 - **`src/main/resources`** — Fabric metadata, access configuration, language files, the mod icon, and GUI textures.
 - **`src/client/java/.../gui`** — configuration screen, HUD editor, sections, theme, and custom widgets.
-- **`src/client/java/.../pickup`** — pickup notifications and rarity detection/highlighting.
-- **`src/client/java/.../recipe`** — recipe-vault unlock highlighting.
+- **`src/client/java/.../pickup`** — pickup alerts and rarity detection/highlighting.
+- **`src/client/java/.../recipe`** — recipe unlock highlighting.
 
 ## License
 
 See the repository license file for licensing terms.
+
+## QoL
+- Inventory Full Warning: shows a small warning above the hotbar when all 36 normal storage slots are occupied.

@@ -3,3 +3,22 @@ accessWidener v2 named
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen hoveredSlot Lnet/minecraft/world/inventory/Slot;
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen leftPos I
 accessible field net/minecraft/client/gui/screens/inventory/AbstractContainerScreen topPos I
+accessible method net/minecraft/client/gui/screens/inventory/AbstractContainerScreen renderTooltip (Lnet/minecraft/client/gui/GuiGraphics;II)V
+accessible method net/minecraft/client/gui/screens/Screen addRenderableWidget (Lnet/minecraft/client/gui/components/events/GuiEventListener;)Lnet/minecraft/client/gui/components/events/GuiEventListener;
+
+# First-person item position renderer: reuse vanilla ItemInHandRenderer logic without Mixins.
+mutable field net/minecraft/client/renderer/GameRenderer itemInHandRenderer Lnet/minecraft/client/renderer/ItemInHandRenderer;
+accessible field net/minecraft/client/renderer/ItemInHandRenderer mainHandItem Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/client/renderer/ItemInHandRenderer offHandItem Lnet/minecraft/world/item/ItemStack;
+accessible field net/minecraft/client/renderer/ItemInHandRenderer mainHandHeight F
+accessible field net/minecraft/client/renderer/ItemInHandRenderer oMainHandHeight F
+accessible field net/minecraft/client/renderer/ItemInHandRenderer offHandHeight F
+accessible field net/minecraft/client/renderer/ItemInHandRenderer oOffHandHeight F
+accessible field net/minecraft/client/renderer/ItemInHandRenderer entityRenderDispatcher Lnet/minecraft/client/renderer/entity/EntityRenderDispatcher;
+accessible field net/minecraft/client/renderer/ItemInHandRenderer itemModelResolver Lnet/minecraft/client/renderer/item/ItemModelResolver;
+accessible method net/minecraft/client/renderer/ItemInHandRenderer evaluateWhichHandsToRender (Lnet/minecraft/client/player/LocalPlayer;)Lnet/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection;
+accessible class net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection
+accessible field net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection renderMainHand Z
+accessible field net/minecraft/client/renderer/ItemInHandRenderer$HandRenderSelection renderOffHand Z
+accessible method net/minecraft/client/renderer/ItemInHandRenderer renderArmWithItem (Lnet/minecraft/client/player/AbstractClientPlayer;FFLnet/minecraft/world/InteractionHand;FLnet/minecraft/world/item/ItemStack;FLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;I)V
+

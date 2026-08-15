@@ -17,11 +17,10 @@ repositories {
 }
 
 loom {
-	// Minecraft 1.21.11 dropped Yarn/Intermediary in favor of shipping unobfuscated
-	// jars with official Mojang mappings — there is no separate "mappings" dependency
-	// to declare anymore (no `net.fabricmc:yarn:...`). This is the new convention as of
-	// the 1.21.11 toolchain change; confirm current syntax against Loom 1.14 docs if
-	// `./gradlew build` complains here.
+	// Minecraft 1.21.11 is still an obfuscated release. This project deliberately uses
+	// Loom official Mojang mappings rather than Yarn; keep all code written against the
+	// exact 1.21.11 Mojang-mapped API.
+	// Do not add a Yarn/intermediary mappings dependency here.
 	splitEnvironmentSourceSets()
 
 	mods {
@@ -35,7 +34,7 @@ loom {
 
 dependencies {
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	// Official Mojang mappings, unobfuscated as of 1.21.11 — no Yarn/mappings() call needed.
+	// Official Mojang mappings for Minecraft 1.21.11.
 	mappings loom.officialMojangMappings()
 
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
