@@ -18,43 +18,21 @@
 
 AcquiredUtils is a utility mod designed for the **FakePixel SMP** experience.
 
-It provides lightweight quality-of-life features for inventory management, item collection, rarity recognition, recipe-vault interaction, HUD customization, and other everyday gameplay tasks.
-
-AcquiredUtils does not add content to the server and does not require changes to the server itself.
+It provides lightweight quality-of-life features, rarity recognition, HUD customization, and other everyday gameplay tasks.
 
 ## Features
 
 ### Inventory & Item Management
 
-- Slot locking for protected inventory slots
-- Item comparison for supported equipment
-- Inventory item search and highlighting
-- Rarity indicators for custom items
+- Slot locking
+- Gear comparison
+- Inventory search
+- Rarity notifications
 
-### Pickup Alerts
+### Overlays
 
-- Pickup alerts
-- Rarity-aware alert colors
-- Duplicate pickup stacking
-- Item icons in notifications
-- Configurable notification duration
-- Custom alert positioning
-
-### Highlights
-
-- Rarity highlight indicators
-- Recipe unlock highlighting
-- Inventory search highlighting
-- Configurable visual overlays
-
-### Configuration
-
-- Searchable settings
-- Adjustable menu size
-- Scrollable settings sections
-- Custom setting toggles
-- Alert position editor
-- Slot Lock key configuration
+- Rarity highlight
+- Recipe unlocked highlighting
 
 ## Compatibility
 
@@ -100,12 +78,6 @@ Windows:
 gradlew.bat build
 ```
 
-The built mod is generated in:
-
-```text
-build/libs/
-```
-
 ## Project Structure
 
 ```text
@@ -139,9 +111,9 @@ AcquiredUtils/
     │           │   └── en_us.json
     │           └── textures/gui/
     │               ├── button_save.png
-    │               ├──     │               ├── checkbox_purple_checked.png
+    │               ├── checkbox_purple_checked.png
     │               ├── checkbox_purple_unchecked.png
-    │               ├──     │               ├── close_button.png
+    │               ├── close_button.png
     │               ├── dropdown_closed.png
     │               ├── dropdown_open_bg.png
     │               ├── dropdown_selection_highlight.png
