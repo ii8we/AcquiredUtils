@@ -31,7 +31,6 @@ public class AcquiredUtilsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientCompatibilityChecker.check();
         AcquiredUtils.LOGGER.info("[AcquiredUtils] Initializing client entrypoint");
         AcquiredUtilsConfig.load();
         FeatureRegistry.init();
