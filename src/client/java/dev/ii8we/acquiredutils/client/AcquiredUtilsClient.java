@@ -7,10 +7,14 @@ import dev.ii8we.acquiredutils.client.gui.section.GeneralSection;
 import dev.ii8we.acquiredutils.client.gui.section.KeybindsSection;
 import dev.ii8we.acquiredutils.client.gui.section.QolSection;
 import dev.ii8we.acquiredutils.client.gui.section.OverlaySection;
-import dev.ii8we.acquiredutils.client.pickup.ItemPickupNotifier;
-import dev.ii8we.acquiredutils.client.render.PositionedItemInHandRenderer;
+import dev.ii8we.acquiredutils.client.features.ItemPickupNotifier;
+import dev.ii8we.acquiredutils.client.features.PositionedItemInHandRenderer;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
-import dev.ii8we.acquiredutils.client.feature.FeatureRegistry;
+import dev.ii8we.acquiredutils.client.features.FeatureRegistry;
+import dev.ii8we.acquiredutils.client.features.SlotLockHandler;
+import dev.ii8we.acquiredutils.client.features.InventorySearchHandler;
+import dev.ii8we.acquiredutils.client.features.InventoryFullWarningHandler;
+import dev.ii8we.acquiredutils.client.features.ContainerOverlayHandler;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -27,6 +31,7 @@ public class AcquiredUtilsClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ClientCompatibilityChecker.check();
         AcquiredUtils.LOGGER.info("[AcquiredUtils] Initializing client entrypoint");
         AcquiredUtilsConfig.load();
         FeatureRegistry.init();

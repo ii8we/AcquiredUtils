@@ -1,7 +1,7 @@
-package dev.ii8we.acquiredutils.client;
+package dev.ii8we.acquiredutils.client.features;
 
-import dev.ii8we.acquiredutils.client.pickup.RarityHighlightHandler;
-import dev.ii8we.acquiredutils.client.recipe.RecipeUnlockHighlightHandler;
+import dev.ii8we.acquiredutils.client.features.RarityHighlightHandler;
+import dev.ii8we.acquiredutils.client.features.RecipeUnlockHighlightHandler;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;

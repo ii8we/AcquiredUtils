@@ -54,11 +54,6 @@ public final class AcquiredUtilsConfig {
     public boolean slotLockEnabled = false;
     public int slotLockKey = -1;
 
-    public boolean autoProtectHotbar = false;
-    public boolean autoProtectInventory = false;
-    public boolean autoProtectArmor = false;
-    public boolean autoProtectOffhand = false;
-
 
     public Set<Integer> lockedSlots = new LinkedHashSet<>();
 

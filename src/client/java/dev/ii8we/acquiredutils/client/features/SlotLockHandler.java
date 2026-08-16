@@ -1,4 +1,4 @@
-package dev.ii8we.acquiredutils.client;
+package dev.ii8we.acquiredutils.client.features;
 
 import dev.ii8we.acquiredutils.AcquiredUtils;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
@@ -267,25 +267,7 @@ public final class SlotLockHandler {
     }
 
     public static boolean isLocked(int containerSlotIndex) {
-        AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
-
-        if (cfg.lockedSlots.contains(containerSlotIndex)) {
-            return true;
-        }
-
-        if (containerSlotIndex >= 0 && containerSlotIndex <= 8 && cfg.autoProtectHotbar) {
-            return true;
-        }
-
-        if (containerSlotIndex >= 9 && containerSlotIndex <= 35 && cfg.autoProtectInventory) {
-            return true;
-        }
-
-        if (containerSlotIndex >= 36 && containerSlotIndex <= 39 && cfg.autoProtectArmor) {
-            return true;
-        }
-
-        return containerSlotIndex == 40 && cfg.autoProtectOffhand;
+        return AcquiredUtilsConfig.get().lockedSlots.contains(containerSlotIndex);
     }
 
     private static void drawPadlock(GuiGraphics graphics, int x, int y) {

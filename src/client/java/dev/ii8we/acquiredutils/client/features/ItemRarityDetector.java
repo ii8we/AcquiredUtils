@@ -1,4 +1,4 @@
-package dev.ii8we.acquiredutils.client.pickup;
+package dev.ii8we.acquiredutils.client.features;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.registries.BuiltInRegistries;

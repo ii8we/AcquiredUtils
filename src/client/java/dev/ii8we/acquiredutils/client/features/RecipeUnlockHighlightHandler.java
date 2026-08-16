@@ -1,4 +1,4 @@
-package dev.ii8we.acquiredutils.client.recipe;
+package dev.ii8we.acquiredutils.client.features;
 
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 import net.minecraft.client.gui.GuiGraphics;

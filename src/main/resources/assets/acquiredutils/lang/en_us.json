@@ -68,5 +68,5 @@
   "acquiredutils.gui.setting.offhand_scale": "Off Hand Scale",
   "acquiredutils.gui.desc.offhand_scale": "Make the off-hand item a little bigger or smaller.",
   "key.acquiredutils.open_config": "Open AcquiredUtils Menu",
-  "key.category.acquiredutils": "AcquiredUtils"
+  "key.category.acquiredutils.acquiredutils": "AcquiredUtils"
 }

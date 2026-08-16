@@ -1,4 +1,4 @@
-package dev.ii8we.acquiredutils.client.feature;
+package dev.ii8we.acquiredutils.client.features;
 
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 
@@ -32,7 +32,13 @@ public final class FeatureRegistry {
             cfg.notificationPositionY = 0.25f;
         }));
         register(new ConfigFeature("rarity_highlight", () -> AcquiredUtilsConfig.get().rarityCircleEnabled, value -> AcquiredUtilsConfig.get().rarityCircleEnabled = value, () -> AcquiredUtilsConfig.get().rarityCircleEnabled = true));
-        register(new ConfigFeature("slot_lock", () -> AcquiredUtilsConfig.get().slotLockEnabled, value -> AcquiredUtilsConfig.get().slotLockEnabled = value, () -> {
+        register(new ConfigFeature("slot_lock", () -> AcquiredUtilsConfig.get().slotLockEnabled, value -> {
+            AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
+            cfg.slotLockEnabled = value;
+            if (value && cfg.slotLockKey < 0) {
+                cfg.slotLockKey = com.mojang.blaze3d.platform.InputConstants.KEY_Z;
+            }
+        }, () -> {
             AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
             cfg.slotLockEnabled = false;
             cfg.lockedSlots.clear();

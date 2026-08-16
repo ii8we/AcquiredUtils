@@ -1,4 +1,4 @@
-package dev.ii8we.acquiredutils.client.feature;
+package dev.ii8we.acquiredutils.client.features;
 
 public interface ClientFeature {
     String id();

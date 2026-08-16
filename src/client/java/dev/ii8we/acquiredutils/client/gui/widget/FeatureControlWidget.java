@@ -1,6 +1,6 @@
 package dev.ii8we.acquiredutils.client.gui.widget;
 
-import dev.ii8we.acquiredutils.client.feature.FeatureRegistry;
+import dev.ii8we.acquiredutils.client.features.FeatureRegistry;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;

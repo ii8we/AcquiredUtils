@@ -1,7 +1,7 @@
-package dev.ii8we.acquiredutils.client;
+package dev.ii8we.acquiredutils.client.features;
 
-import dev.ii8we.acquiredutils.client.pickup.ItemRarity;
-import dev.ii8we.acquiredutils.client.pickup.ItemRarityDetector;
+import dev.ii8we.acquiredutils.client.features.ItemRarity;
+import dev.ii8we.acquiredutils.client.features.ItemRarityDetector;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;

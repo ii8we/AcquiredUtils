@@ -1,6 +1,8 @@
 # Gradle
 .gradle/
 build/
+security-rely/
+.gitignore/
 
 # IntelliJ IDEA
 .idea/

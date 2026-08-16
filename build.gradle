@@ -11,13 +11,10 @@ base {
 }
 
 repositories {
-	// Fabric/Mojang/Maven Central are added automatically by the Loom plugin.
-	// Add extra repos here only if a dependency needs one (e.g. a mod hosted on a
-	// third-party maven such as Modrinth's or CurseMaven).
+
 }
 
 loom {
-	// Minecraft 1.21.11 is still an obfuscated release. This project deliberately uses
 	// Loom official Mojang mappings rather than Yarn; keep all code written against the
 	// exact 1.21.11 Mojang-mapped API.
 	// Do not add a Yarn/intermediary mappings dependency here.
@@ -73,6 +70,6 @@ publishing {
 		}
 	}
 	repositories {
-		// Add your deployment repo here, e.g. GitHub Packages.
+		
 	}
 }
