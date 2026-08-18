@@ -46,6 +46,6 @@ See the repository license file for licensing terms.
 
 ## Community
 
-Join the AcquiredUtils Discord server for announcements, development updates, support, and more.
+[![Discord](https://img.shields.io/discord/YOUR_SERVER_ID?label=Discord&logo=discord&logoColor=white)](https://discord.gg/9yFj7vxmdp)
 
-[Join the Discord Server](https://discord.gg/9yFj7vxmdp)
+Join the official AcquiredUtils Discord server.
