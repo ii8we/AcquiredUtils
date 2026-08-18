@@ -43,3 +43,9 @@ See [privacy.md](privacy.md) for the project's privacy information.
 ## License
 
 See the repository license file for licensing terms.
+
+## Community
+
+Join the AcquiredUtils Discord server for announcements, development updates, support, and more.
+
+[Join the Discord Server](https://discord.gg/9yFj7vxmdp)
