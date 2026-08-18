@@ -5,7 +5,7 @@
 <h1 align="center">AcquiredUtils</h1>
 
 <p align="center">
-  Fabric client-side mod for FakePixel SMP.
+  Fabric client-side mod for FakePixel SMP (You can use this mod on onther server without any risk!).
 </p>
 
 <p align="center">
