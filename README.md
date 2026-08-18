@@ -16,11 +16,7 @@
 
 ## Compatibility
 
-AcquiredUtils is developed for:
-
-- Minecraft 1.21.11
-- Fabric Loader
-- Fabric API
+AcquiredUtils is developed without mixins to avoid conflicts with other mods that modify the same Minecraft classes. It relies on Fabric API events and supported APIs whenever possible to provide better compatibility with other mods.
 
 ## Installation
 
@@ -39,21 +35,6 @@ AcquiredUtils is developed for:
 - Minecraft 1.21.11
 - Fabric Loom
 - Fabric API
-
-### Build
-
-Linux / GitHub Codespaces:
-
-```bash
-chmod +x gradlew
-./gradlew build
-```
-
-Windows:
-
-```bat
-gradlew.bat build
-```
 
 ## Privacy
 
