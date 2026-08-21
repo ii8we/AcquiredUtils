@@ -12,7 +12,7 @@
   <b>Minecraft 1.21.11</b> · <b>Fabric</b>
 </p>
 
-                                 [![Discord](https://img.shields.io/badge/Discord-AcquiredUtils-5865F2?logo=discord&logoColor=white)](https://discord.gg/9yFj7vxmdp)
+[![Discord](https://img.shields.io/badge/Discord-AcquiredUtils-5865F2?logo=discord&logoColor=white)](https://discord.gg/9yFj7vxmdp)
 
 ---
 
