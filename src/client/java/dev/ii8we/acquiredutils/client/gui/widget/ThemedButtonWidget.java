@@ -14,6 +14,7 @@ public class ThemedButtonWidget extends AbstractWidget {
 
     private final Runnable clickHandler;
     private final boolean bold;
+    private boolean highlighted;
 
     public ThemedButtonWidget(int x, int y, int width, int height, Component label, Runnable clickHandler) {
         this(x, y, width, height, label, clickHandler, false);
@@ -30,10 +31,11 @@ public class ThemedButtonWidget extends AbstractWidget {
         Theme theme = Theme.current();
         boolean hovered = isHovered();
         boolean focused = isFocused();
+        boolean active = highlighted;
 
-        int outer = hovered ? theme.accentBright : (focused ? theme.accent : theme.frameMid);
-        int top = hovered ? theme.headerTop : theme.sidebarTop;
-        int bottom = hovered ? theme.buttonBottom : theme.sidebarBottom;
+        int outer = active ? theme.frameAccent : (hovered ? theme.accentBright : (focused ? theme.accent : theme.frameMid));
+        int top = active ? theme.headerTop : (hovered ? theme.headerTop : theme.sidebarTop);
+        int bottom = active ? theme.buttonBottom : (hovered ? theme.buttonBottom : theme.sidebarBottom);
 
         graphics.fillGradient(
             getX() + 1, getY() + 1,
@@ -45,11 +47,17 @@ public class ThemedButtonWidget extends AbstractWidget {
         if (width > 6 && height > 6) {
             graphics.renderOutline(
                 getX() + 2, getY() + 2, width - 4, height - 4,
-                hovered ? theme.frameAccent : theme.frameMid
+                active ? theme.frameAccent : (hovered ? theme.frameAccent : theme.frameMid)
             );
         }
 
-        if (hovered) {
+        if (active) {
+            graphics.fill(
+                getX() + 3, getY() + 3,
+                getX() + width - 3, getY() + height - 3,
+                0x55333300
+            );
+        } else if (hovered) {
             graphics.fill(
                 getX() + 3, getY() + 3,
                 getX() + width - 3, getY() + 4,
@@ -69,9 +77,18 @@ public class ThemedButtonWidget extends AbstractWidget {
             text,
             getX() + (width - textWidth) / 2,
             textY,
-            hovered ? theme.accentBright : theme.text,
+            (active || hovered) ? theme.accentBright : theme.text,
             false
         );
+    }
+
+
+    public void setHighlighted(boolean highlighted) {
+        this.highlighted = highlighted;
+    }
+
+    public boolean isHighlighted() {
+        return highlighted;
     }
 
     @Override

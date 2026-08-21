@@ -5,7 +5,7 @@
 <h1 align="center">AcquiredUtils</h1>
 
 <p align="center">
-  Utility mod for FakePixel SMP (You can use this mod on onther server without any risk!).
+  Utility mod for FakePixel SMP .
 </p>
 
 <p align="center">

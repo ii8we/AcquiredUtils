@@ -34,8 +34,8 @@ public class AcquiredUtilsConfigScreen extends Screen {
     private static final Identifier BACKGROUND_TEXTURE =
         Identifier.fromNamespaceAndPath("acquiredutils", "textures/gui/menu_backdrop.png");
 
-    public static final int BASE_PANEL_WIDTH = 560;
-    public static final int BASE_PANEL_HEIGHT = 310;
+    public static final int BASE_PANEL_WIDTH = 600;
+    public static final int BASE_PANEL_HEIGHT = 340;
     public static final int BASE_HEADER_HEIGHT = 56;
     public static final int BASE_FOOTER_HEIGHT = 28;
     public static final int BASE_SIDEBAR_WIDTH = 126;
@@ -69,11 +69,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
     private record RowCard(int x, int y, int w, int h, boolean child, String featureId) {}
     private record ContentEntry(GuiRow row, boolean child, String featureId) {}
 
-    /**
-     * Feature IDs whose child settings are currently expanded in this screen.
-     * Expansion is UI state only and is intentionally independent from whether
-     * the feature itself is enabled.
-     */
+    /** Feature IDs with expanded child settings. */
     private final Set<String> expandedFeatures = new HashSet<>();
 
     private record FeatureHit(int x, int y, int w, int h, String featureId,
@@ -241,6 +237,26 @@ public class AcquiredUtilsConfigScreen extends Screen {
             Component.literal("×"),
             this::onClose
         ));
+
+        ModSection active = sections.get(activeSectionId);
+        if (active != null) {
+            active.buildFooter();
+        }
+    }
+
+    /**
+     * Places the Keybinds section's Custom Keybinds button in the shared footer.
+     * Reserve this slot for the reset control.
+     */
+    public void addKeybindFooterButton(Component label, Runnable action) {
+        int width = s(115);
+        int height = s(20);
+        int x = panelX + sidebarWidth + s(56);
+        int y = panelY + panelHeight - footerHeight + (footerHeight - height) / 2;
+
+        addRenderableWidget(new ThemedButtonWidget(
+            x, y, width, height, label, action
+        ));
     }
 
     private void buildSidebarTabs() {
@@ -373,9 +389,6 @@ public class AcquiredUtilsConfigScreen extends Screen {
             );
             entries.add(new ContentEntry(parentRow, false, feature.id()));
 
-            // Child controls are intentionally hidden until the user expands
-            // the parent feature. Expansion is independent from the enabled
-            // state so users can configure a feature before turning it on.
             if (expandedFeatures.contains(feature.id())) {
                 for (GuiRow child : feature.children()) {
                     if (searchQuery.isEmpty()
@@ -1033,7 +1046,6 @@ public class AcquiredUtilsConfigScreen extends Screen {
         Component desc = Component.translatable(translationKey);
         int safeWidth = Math.max(80, maxWidth);
 
-        // Descriptions are allowed to wrap instead of being truncated with
         // an ellipsis. This keeps the complete localized description visible
         // inside the setting card, including longer translations.
         List<net.minecraft.util.FormattedCharSequence> lines =
@@ -1090,6 +1102,16 @@ public class AcquiredUtilsConfigScreen extends Screen {
         }
 
         if (event.button() == 0) {
+            // Only one value slider may own keyboard focus at a time. This also
+            // commits/cancels an editor from the previously focused slider before
+            // another widget receives the click.
+            for (AbstractWidget widget : sectionWidgets) {
+                if (widget instanceof dev.ii8we.acquiredutils.client.gui.widget.ValueSliderWidget slider
+                    && slider.isFocused()) {
+                    slider.clearInteractiveFocus();
+                }
+            }
+
             // Clicking a feature card expands/collapses its child settings.
             // Clicking the actual checkbox is left to FeatureControlWidget so
             // the checkbox still toggles the feature itself.

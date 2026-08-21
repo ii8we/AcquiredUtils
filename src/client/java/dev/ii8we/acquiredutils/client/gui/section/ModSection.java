@@ -62,6 +62,12 @@ public abstract class ModSection {
         return false;
     }
 
+    /**
+     * Allows a section to place optional controls in the shared footer area.
+     */
+    public void buildFooter() {
+    }
+
     public void onClose() {
     }
 }

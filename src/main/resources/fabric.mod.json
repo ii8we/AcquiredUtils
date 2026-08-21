@@ -24,5 +24,11 @@
     "java": ">=21",
     "fabric-api": ">=0.141.6+1.21.11"
   },
-  "accessWidener": "acquiredutils.accesswidener"
+  "accessWidener": "acquiredutils.accesswidener",
+  "mixins": [
+    {
+      "config": "acquiredutils.client.mixins.json",
+      "environment": "client"
+    }
+  ]
 }

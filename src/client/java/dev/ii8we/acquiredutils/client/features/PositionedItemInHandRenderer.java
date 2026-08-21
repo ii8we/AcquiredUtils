@@ -64,6 +64,36 @@ public final class PositionedItemInHandRenderer extends ItemInHandRenderer {
     }
 
     @Override
+    public void renderItem(
+        net.minecraft.world.entity.LivingEntity mob,
+        ItemStack itemStack,
+        net.minecraft.world.item.ItemDisplayContext type,
+        PoseStack poseStack,
+        SubmitNodeCollector submitNodeCollector,
+        int lightCoords
+    ) {
+        if (itemStack.isEmpty()) {
+            return;
+        }
+
+        net.minecraft.client.renderer.item.ItemStackRenderState renderState = new net.minecraft.client.renderer.item.ItemStackRenderState();
+        this.itemModelResolver.updateForTopItem(
+            renderState,
+            itemStack,
+            type,
+            mob.level(),
+            mob,
+            mob.getId() + type.ordinal()
+        );
+
+        if (mob == Minecraft.getInstance().player) {
+            RarityGlintHandler.applyHeldItemGlint(renderState, itemStack, (net.minecraft.world.entity.player.Player) mob);
+        }
+
+        renderState.submit(poseStack, submitNodeCollector, lightCoords, net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY, 0);
+    }
+
+    @Override
     public void renderHandsWithItems(
         float tickProgress,
         PoseStack poseStack,
@@ -73,8 +103,8 @@ public final class PositionedItemInHandRenderer extends ItemInHandRenderer {
     ) {
         AcquiredUtilsConfig config = AcquiredUtilsConfig.get();
 
-        // Completely preserve vanilla behaviour when the feature is disabled.
-        if (!config.itemPositionEnabled) {
+        // Keep the vanilla path only when neither held-item feature needs it.
+        if (!config.itemPositionEnabled && !config.rarityGlintEnabled) {
             super.renderHandsWithItems(tickProgress, poseStack, submitNodeCollector, player, light);
             return;
         }
@@ -166,7 +196,7 @@ public final class PositionedItemInHandRenderer extends ItemInHandRenderer {
     ) {
         // Empty hands are not items. Do not move/rotate the player arm when only
         // the held-item feature is enabled.
-        if (itemStack.isEmpty()) {
+        if (!config.itemPositionEnabled || itemStack.isEmpty()) {
             renderArmWithItem(
                 player,
                 tickProgress,

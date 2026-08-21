@@ -1,5 +1,6 @@
 package dev.ii8we.acquiredutils.client.features;
 
+import dev.ii8we.acquiredutils.client.compat.ServerCompatibility;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -32,7 +33,7 @@ public final class RecipeUnlockHighlightHandler {
         List<Slot> highlighted = new ArrayList<>();
 
         AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
-        if (!cfg.recipeUnlockHighlightEnabled || player == null || !isRecipeVault(screen)) {
+        if (!ServerCompatibility.isFeatureAllowed("recipe_unlock_highlight") || !cfg.recipeUnlockHighlightEnabled || player == null || !isRecipeVault(screen)) {
             return highlighted;
         }
 

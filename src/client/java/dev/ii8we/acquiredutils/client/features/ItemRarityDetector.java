@@ -24,13 +24,10 @@ public final class ItemRarityDetector {
         Pattern.compile("^MYTHIC(?:\\s|$)")
     };
 
-    private static final int MAX_CACHE_ENTRIES = 256;
-    private static final Map<CacheKey, ItemRarity> CACHE = new LinkedHashMap<>(64, 0.75f, true) {
-        @Override
-        protected boolean removeEldestEntry(Map.Entry<CacheKey, ItemRarity> eldest) {
-            return size() > MAX_CACHE_ENTRIES;
-        }
-    };
+    private static final int DEFAULT_MAX_CACHE_ENTRIES = 256;
+    private static final int REDUCED_MAX_CACHE_ENTRIES = 64;
+    private static int maxCacheEntries = DEFAULT_MAX_CACHE_ENTRIES;
+    private static final Map<CacheKey, ItemRarity> CACHE = new LinkedHashMap<>(64, 0.75f, true);
 
     private ItemRarityDetector() {
     }
@@ -51,14 +48,8 @@ public final class ItemRarityDetector {
         }
 
         /*
-         * The SMP stores rarity in the lore/tooltip text, for example:
-         * "EPIC CHESTPLATE".
-         *
-         * The item's display-name color is intentionally NOT used here.
-         * This prevents ordinary items with a colored name from being
-         * incorrectly marked as a rarity item.
-         *
-         * Tooltip line 0 is the item's display name, so start at line 1
+         * Rarity is read from the tooltip text, not the display-name color.
+         * Tooltip line 0 is the item name, so start at line 1.
          * and inspect only the remaining tooltip/lore lines.
          */
         var tooltipLines = stack.getTooltipLines(
@@ -74,6 +65,7 @@ public final class ItemRarityDetector {
             if (rarity != null) {
                 synchronized (CACHE) {
                     CACHE.put(cacheKey, rarity);
+                    trimCacheLocked();
                 }
                 return rarity;
             }
@@ -81,6 +73,7 @@ public final class ItemRarityDetector {
 
         synchronized (CACHE) {
             CACHE.put(cacheKey, null);
+            trimCacheLocked();
         }
         return null;
     }
@@ -96,9 +89,35 @@ public final class ItemRarityDetector {
 
         return null;
     }
+    public static void setReducedCacheMode(boolean reduced) {
+        synchronized (CACHE) {
+            maxCacheEntries = reduced ? REDUCED_MAX_CACHE_ENTRIES : DEFAULT_MAX_CACHE_ENTRIES;
+            if (CACHE.size() > maxCacheEntries) {
+                trimCacheLocked();
+            }
+        }
+    }
+
+    public static int getCacheSize() {
+        synchronized (CACHE) {
+            return CACHE.size();
+        }
+    }
+
     public static void clearCache() {
         synchronized (CACHE) {
             CACHE.clear();
+        }
+    }
+
+    private static void trimCacheLocked() {
+        while (CACHE.size() > maxCacheEntries) {
+            var iterator = CACHE.entrySet().iterator();
+            if (!iterator.hasNext()) {
+                break;
+            }
+            iterator.next();
+            iterator.remove();
         }
     }
 }

@@ -4,10 +4,7 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- * Common constants and logging for the client-only mod.
- * The class intentionally contains no client-only initialization.
- */
+/** Common constants and logging. */
 public class AcquiredUtils implements ModInitializer {
 
 	public static final String MOD_ID = "acquiredutils";
@@ -15,7 +12,5 @@ public class AcquiredUtils implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		// Intentionally empty: AcquiredUtils is client-only and initializes from
-		// AcquiredUtilsClient.
 	}
 }

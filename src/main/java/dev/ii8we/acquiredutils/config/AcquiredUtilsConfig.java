@@ -25,6 +25,19 @@ public final class AcquiredUtilsConfig {
     public float notificationPositionX = 0.5f;
     public float notificationPositionY = 0.25f;
     public float menuScale = 1.0f;
+    public boolean disableGlowingEffects = false;
+    public boolean playerAbilitiesPanelEnabled = true;
+    public boolean healthBarOverlayEnabled = true;
+    public float healthBarOverlayPositionX = 0.5f;
+    public float healthBarOverlayPositionY = 0.84f;
+    public float healthBarOverlayScale = 1.0f;
+    public boolean manaBarOverlayEnabled = true;
+    public float manaBarOverlayPositionX = 0.5f;
+    public float manaBarOverlayPositionY = 0.89f;
+    public float manaBarOverlayScale = 1.0f;
+    public float playerAbilitiesPanelScale = 1.0f;
+    public float playerAbilitiesPanelPositionX = 0.72f;
+    public float playerAbilitiesPanelPositionY = 0.20f;
 
     // First-person held-item position controls. Values are offsets applied relative
     // to vanilla hand placement once the render hook is enabled.
@@ -46,13 +59,17 @@ public final class AcquiredUtilsConfig {
     public boolean recipeUnlockHighlightEnabled = true;
 
     public boolean rarityCircleEnabled = true;
+    public boolean rarityGlintEnabled = true;
 
     public boolean itemComparisonEnabled = true;
     public boolean inventorySearchEnabled = true;
+    public boolean chatCombinationEnabled = true;
+    public boolean chatCopyingEnabled = true;
     public boolean inventoryFullWarningEnabled = true;
 
     public boolean slotLockEnabled = false;
-    public int slotLockKey = -1;
+    public int slotLockKey = 90; // GLFW_KEY_Z
+    public int openConfigKey = 39; // GLFW_KEY_APOSTROPHE
 
 
     public Set<Integer> lockedSlots = new LinkedHashSet<>();
@@ -92,6 +109,19 @@ public final class AcquiredUtilsConfig {
         notificationPositionX = Math.max(0.0f, Math.min(1.0f, notificationPositionX));
         notificationPositionY = Math.max(0.0f, Math.min(1.0f, notificationPositionY));
         menuScale = clampMenuScale(menuScale);
+        playerAbilitiesPanelScale = clampOverlayScale(playerAbilitiesPanelScale);
+        healthBarOverlayScale = clampOverlayScale(healthBarOverlayScale);
+        healthBarOverlayPositionX = clampOverlayPosition(healthBarOverlayPositionX);
+        healthBarOverlayPositionY = clampOverlayPosition(healthBarOverlayPositionY);
+        manaBarOverlayScale = clampOverlayScale(manaBarOverlayScale);
+        manaBarOverlayPositionX = clampOverlayPosition(manaBarOverlayPositionX);
+        manaBarOverlayPositionY = clampOverlayPosition(manaBarOverlayPositionY);
+        playerAbilitiesPanelPositionX = clampOverlayPosition(playerAbilitiesPanelPositionX);
+        playerAbilitiesPanelPositionY = clampOverlayPosition(playerAbilitiesPanelPositionY);
+        // Gson may leave newly introduced primitive keybind fields at 0 when
+        // loading an older config that does not contain them. Zero is not a
+        // valid GLFW keyboard key for these bindings, so restore the defaults.
+        if (openConfigKey == 0) openConfigKey = 39; // GLFW_KEY_APOSTROPHE
         if (Float.isNaN(menuScale) || Float.isInfinite(menuScale)) menuScale = 1.0f;
 
         mainHandPositionX = clampItemOffset(mainHandPositionX);
@@ -113,9 +143,19 @@ public final class AcquiredUtilsConfig {
         lockedSlots.removeIf(idx -> idx == null || idx < 0 || idx > 40);
     }
 
+    private static float clampOverlayPosition(float value) {
+        if (!Float.isFinite(value)) return 0.5f;
+        return Math.max(0.0f, Math.min(1.0f, value));
+    }
+
+    private static float clampOverlayScale(float value) {
+        if (!Float.isFinite(value)) return 1.0f;
+        return Math.max(0.5f, Math.min(2.0f, value));
+    }
+
     private static float clampMenuScale(float value) {
         if (!Float.isFinite(value)) return 1.0f;
-        return Math.max(0.5f, Math.min(1.5f, value));
+        return Math.max(0.5f, Math.min(2.5f, value));
     }
 
     private static float clampRotation(float value) {

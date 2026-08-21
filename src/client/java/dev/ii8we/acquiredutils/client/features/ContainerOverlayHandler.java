@@ -29,11 +29,14 @@ public final class ContainerOverlayHandler {
                 return;
             }
 
-            ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, partialTick) ->
-                render(graphics, containerScreen, mouseX, mouseY)
-            );
+
+            ScreenEvents.afterRender(screen).register((s, graphics, mouseX, mouseY, partialTick) -> {
+                render(graphics, containerScreen, mouseX, mouseY);
+            });
+
         });
     }
+
 
     private static void render(
         GuiGraphics graphics,
@@ -80,11 +83,10 @@ public final class ContainerOverlayHandler {
         if (!redraw.isEmpty()) {
             graphics.nextStratum();
             for (Slot slot : redraw) {
-                renderSlotItem(graphics, slot, leftPos, topPos);
+                renderSlotItem(graphics, slot, leftPos, topPos, player);
             }
         }
 
-        // Slot-lock is intentionally the only slot overlay drawn above the
         // item itself. The tooltip is submitted immediately afterwards, so
         // the item's description remains on top of the lock icon.
         SlotLockHandler.renderIcons(graphics, locked, leftPos, topPos);
@@ -99,7 +101,7 @@ public final class ContainerOverlayHandler {
 
         // On 1.21.11 the ScreenEvents after-render hook can run after the normal
         // deferred tooltip pass. Re-submit and immediately render the current
-        // container tooltip so it is guaranteed to sit above every slot overlay.
+        // Draw the tooltip overlay last.
         screen.renderTooltip(graphics, mouseX, mouseY);
         graphics.renderDeferredElements();
     }
@@ -108,18 +110,20 @@ public final class ContainerOverlayHandler {
         GuiGraphics graphics,
         Slot slot,
         int leftPos,
-        int topPos
+        int topPos,
+        Player player
     ) {
-        ItemStack stack = slot.getItem();
-        if (stack.isEmpty()) {
+        ItemStack original = slot.getItem();
+        if (original.isEmpty()) {
             return;
         }
 
         int x = leftPos + slot.x;
         int y = topPos + slot.y;
 
-        graphics.renderItem(stack, x, y);
-        graphics.renderItemDecorations(Minecraft.getInstance().font, stack, x, y);
+        // Inventory and vault items keep the normal vanilla glint. Rarity Glint
+        graphics.renderItem(original, x, y);
+        graphics.renderItemDecorations(Minecraft.getInstance().font, original, x, y);
     }
 
 

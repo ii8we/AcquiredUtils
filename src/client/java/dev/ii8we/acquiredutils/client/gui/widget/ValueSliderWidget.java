@@ -37,6 +37,12 @@ public class ValueSliderWidget extends AbstractSliderButton {
         super(x, y, width, height, Component.empty(), normalize(initialValue, min, max));
         this.min = min;
         this.max = max;
+        if (!Float.isFinite(min) || !Float.isFinite(max) || max <= min) {
+            throw new IllegalArgumentException("Slider max must be greater than min");
+        }
+        if (!Float.isFinite(step) || step <= 0.0f) {
+            throw new IllegalArgumentException("Slider step must be greater than zero");
+        }
         this.step = step;
         this.percentage = percentage;
         this.suffix = suffix;
@@ -54,6 +60,9 @@ public class ValueSliderWidget extends AbstractSliderButton {
     }
 
     private static double normalize(double value, double min, double max) {
+        if (max <= min) {
+            return 0.0;
+        }
         double clamped = Math.max(min, Math.min(max, value));
         return (clamped - min) / (max - min);
     }
@@ -112,8 +121,6 @@ public class ValueSliderWidget extends AbstractSliderButton {
         }
 
         if (editingValue) {
-            // Clicking elsewhere finishes a valid edit instead of silently
-            // discarding the number the user just entered.
             if (!commitEdit()) {
                 cancelEditing();
             }
@@ -142,10 +149,7 @@ public class ValueSliderWidget extends AbstractSliderButton {
         return draggingWithMouse;
     }
 
-    /**
-     * Exposes the widget visibility state to the parent settings screen.
-     * The vanilla field is intentionally kept encapsulated here.
-     */
+    /** Returns whether the widget is visible. */
     public boolean isVisible() {
         return this.visible;
     }
@@ -168,9 +172,7 @@ public class ValueSliderWidget extends AbstractSliderButton {
     }
 
     private int resetX() {
-        // Keep the reset control in the dedicated left-hand slot of the slider row.
-        int centerX = getX() + RESET_SIZE / 2 + 1;
-        return centerX - RESET_SIZE / 2;
+        return getX() + Math.max(0, getWidth() - RESET_SIZE);
     }
 
     private int resetY() {
@@ -179,6 +181,9 @@ public class ValueSliderWidget extends AbstractSliderButton {
     }
 
     private boolean isSliderAreaHovered(double mouseX, double mouseY) {
+        if (isResetHovered(mouseX, mouseY)) {
+            return false;
+        }
         return mouseX >= getX()
             && mouseX < getX() + getWidth()
             && mouseY >= getY()
@@ -197,7 +202,8 @@ public class ValueSliderWidget extends AbstractSliderButton {
     private boolean isValueBadgeHovered(double mouseX, double mouseY) {
         Minecraft minecraft = Minecraft.getInstance();
         int valueW = valueBadgeWidth(minecraft);
-        int valueX = getX() + getWidth() - valueW;
+        int contentRight = Math.max(getX() + 1, resetX() - 5);
+        int valueX = Math.max(getX() + 1, contentRight - valueW);
         int centerY = getY() + Math.min(SLIDER_AREA_HEIGHT, getHeight()) / 2;
         int valueH = Math.min(18, Math.max(1, SLIDER_AREA_HEIGHT - 2));
         int valueY = centerY - valueH / 2;
@@ -305,19 +311,17 @@ public class ValueSliderWidget extends AbstractSliderButton {
 
     private void resetToDefault() {
         setAbsoluteValue(defaultValue);
-        snapToStep();
         updateMessage();
-        onReleaseAction.run();
     }
 
     private void setValueFromMouse(double mouseX) {
-        int trackLeft = getX() + 3;
-
         Minecraft minecraft = Minecraft.getInstance();
         int valueW = valueBadgeWidth(minecraft);
-        int valueX = getX() + getWidth() - valueW;
-        int trackRight = valueX - 8;
+        int contentRight = Math.max(getX() + 1, resetX() - 5);
+        int valueX = Math.max(getX() + 1, contentRight - valueW);
 
+        int trackLeft = getX() + 3;
+        int trackRight = valueX - 8;
         if (trackRight <= trackLeft) {
             trackRight = Math.max(trackLeft + 1, getX() + getWidth() - 3);
         }
@@ -476,11 +480,9 @@ public class ValueSliderWidget extends AbstractSliderButton {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        // Mouse-wheel adjustment is intentionally opt-in: hold Shift while
-        // hovering/focusing a slider. Without Shift, the parent settings
-        // screen keeps normal scrolling behavior.
+        // Shift + wheel adjusts the slider.
         if (!isShiftDown()) return false;
-        if (!isSliderAreaHovered(mouseX, mouseY) && !isResetHovered(mouseX, mouseY) && !isFocused()) return false;
+        if (!isSliderAreaHovered(mouseX, mouseY)) return false;
         if (scrollY == 0.0) return false;
 
         double multiplier = scrollY > 0 ? 1.0 : -1.0;
@@ -500,6 +502,17 @@ public class ValueSliderWidget extends AbstractSliderButton {
         this.value = normalize(clamped, min, max);
         snapToStep();
         applyValue();
+        onReleaseAction.run();
+    }
+
+    public void clearInteractiveFocus() {
+        if (editingValue) {
+            if (!commitEdit()) {
+                cancelEditing();
+            }
+        }
+        draggingWithMouse = false;
+        setFocused(false);
     }
 
     @Override
@@ -538,12 +551,13 @@ public class ValueSliderWidget extends AbstractSliderButton {
 
         int valueW = valueBadgeWidth(minecraft);
         int valueH = Math.min(18, Math.max(1, SLIDER_AREA_HEIGHT - 2));
-        int valueX = outerRight - valueW;
+        int resetX = resetX();
+        int contentRight = Math.max(outerLeft + 1, resetX - 5);
+        int valueX = Math.max(outerLeft + 1, contentRight - valueW);
         int valueY = centerY - valueH / 2;
 
-        // Reserve a small slot at the left of the slider for the reset control.
-        // The slider track starts after that slot so the reset icon never overlaps the track.
-        int trackLeft = outerLeft + RESET_SIZE + 7;
+        // The reset control stays beside the slider on the same horizontal row.
+        int trackLeft = outerLeft + 3;
         int trackRight = valueX - 8;
         if (trackRight <= trackLeft) {
             trackRight = Math.max(trackLeft + 1, outerRight - 3);
@@ -598,7 +612,6 @@ public class ValueSliderWidget extends AbstractSliderButton {
             graphics.renderOutline(outerLeft, outerTop, getWidth(), Math.max(1, outerBottom - outerTop + 1), theme.accent);
         }
 
-        int resetX = resetX();
         int resetY = resetY();
         boolean resetHovered = isResetHovered(mouseX, mouseY);
         if (resetHovered) {

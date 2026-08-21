@@ -1,7 +1,6 @@
 package dev.ii8we.acquiredutils.client.features;
 
-import dev.ii8we.acquiredutils.client.features.ItemRarity;
-import dev.ii8we.acquiredutils.client.features.ItemRarityDetector;
+import dev.ii8we.acquiredutils.client.compat.ServerCompatibility;
 import dev.ii8we.acquiredutils.config.AcquiredUtilsConfig;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
 import net.minecraft.client.Minecraft;
@@ -22,14 +21,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-/**
- * Search/highlight overlay for container screens.
- *
- * Text entry is delegated to Minecraft's native EditBox widget so character
- * input, keyboard layouts, selection, clipboard, deletion, and navigation all
- * follow the current Minecraft client implementation instead of manually
- * translating GLFW key codes.
- */
+/** Search and highlight overlay for container screens. */
 public final class InventorySearchHandler {
 
     private static final int SEARCH_WIDTH = 190;
@@ -55,7 +47,7 @@ public final class InventorySearchHandler {
 
     public static void init() {
         ScreenEvents.AFTER_INIT.register((client, screen, scaledWidth, scaledHeight) -> {
-            if (!AcquiredUtilsConfig.get().inventorySearchEnabled) {
+            if (!ServerCompatibility.isFeatureAllowed("inventory_search") || !AcquiredUtilsConfig.get().inventorySearchEnabled) {
                 return;
             }
             if (!(screen instanceof AbstractContainerScreen<?> containerScreen)) {
@@ -85,7 +77,6 @@ public final class InventorySearchHandler {
                 STATES.put(screen, state);
             }
 
-            // Screen.addRenderableWidget is protected in 1.21.11; the project
             // exposes it through the existing access-widener rather than a Mixin.
             screen.addRenderableWidget(editBox);
 
@@ -95,7 +86,6 @@ public final class InventorySearchHandler {
             );
 
             // While the search box has focus, the inventory-toggle key (E by
-            // default) belongs to text input instead of the container screen.
             // Block only that one screen-level action so typing the letter
             // "e" cannot close the inventory. The following character event
             // still reaches EditBox and inserts the actual character.
@@ -168,9 +158,7 @@ public final class InventorySearchHandler {
                 java.util.List.of(
                     Component.literal("Inventory search"),
                     Component.literal("Click the bar to start typing"),
-                    Component.literal("#<rarity>  e.g. #epic"),
-                    Component.literal("!<enchantment>  e.g. !sharpness"),
-                    Component.literal("Combine: #epic !sharpness sword")
+                    Component.literal("!<enchantment>  e.g. !sharpness")
                 ),
                 java.util.Optional.empty(),
                 mouseX,
@@ -189,13 +177,10 @@ public final class InventorySearchHandler {
         }
         x = Math.max(SEARCH_MARGIN, x);
 
-        int y = screen.topPos - height - SEARCH_MARGIN;
-        if (y < SEARCH_MARGIN) {
-            y = screen.topPos + SEARCH_MARGIN;
-        }
-        if (y + height > screen.height - SEARCH_MARGIN) {
-            y = Math.max(SEARCH_MARGIN, screen.height - height - SEARCH_MARGIN);
-        }
+        // Keep the search bar at the absolute bottom of the screen rather than
+        // attaching it to the container. This keeps the position consistent for
+        // inventories and vaults of different sizes.
+        int y = Math.max(SEARCH_MARGIN, screen.height - height - SEARCH_MARGIN);
 
         return new SearchBounds(x, y, width, height);
     }
@@ -212,17 +197,6 @@ public final class InventorySearchHandler {
 
         for (String token : tokens) {
             if (token.isBlank()) continue;
-
-            if (token.charAt(0) == '#') {
-                String rarityName = token.substring(1);
-                if (rarityName.isEmpty()) return false;
-
-                ItemRarity rarity = ItemRarityDetector.detect(stack, Minecraft.getInstance().player);
-                if (rarity == null || !rarity.name().toLowerCase(Locale.ROOT).equals(rarityName)) {
-                    return false;
-                }
-                continue;
-            }
 
             if (token.charAt(0) == '!') {
                 String enchantmentName = token.substring(1).replace('-', '_');

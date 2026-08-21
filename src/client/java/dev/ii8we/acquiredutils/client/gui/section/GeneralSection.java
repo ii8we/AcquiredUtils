@@ -29,8 +29,8 @@ public class GeneralSection extends ModSection {
     public List<GuiRow> getRows() {
         AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
 
-        // Menu Scale controls the AcquiredUtils configuration menu itself.
-        // Held-item scale remains part of the Held Item Position feature below.
+        // These sliders control only menu presentation. Feature-specific scales
+        // remain under their respective feature settings.
         return List.of(
             new GuiRow(
                 "acquiredutils.gui.setting.menu_scale",
@@ -41,7 +41,7 @@ public class GeneralSection extends ModSection {
                     cfg.menuScale,
                     1.0f,
                     0.5f,
-                    1.5f,
+                    2.5f,
                     0.05f,
                     true,
                     "",

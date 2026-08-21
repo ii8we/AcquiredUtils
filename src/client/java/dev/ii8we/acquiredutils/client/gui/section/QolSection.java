@@ -45,6 +45,32 @@ public final class QolSection extends ModSection {
                 List.of()
             ),
             new GuiFeature(
+                "chat_combination",
+                "acquiredutils.gui.setting.chat_combination",
+                "acquiredutils.gui.desc.chat_combination",
+                () -> cfg.chatCombinationEnabled,
+                enabled -> {
+                    cfg.chatCombinationEnabled = enabled;
+                    cfg.markDirty();
+                    screen.scheduleRebuild();
+                },
+                (x, y, w, h) -> new FeatureControlWidget(x, y, w, h, "chat_combination", screen::scheduleRebuild),
+                List.of()
+            ),
+            new GuiFeature(
+                "chat_copying",
+                "acquiredutils.gui.setting.chat_copying",
+                "acquiredutils.gui.desc.chat_copying",
+                () -> cfg.chatCopyingEnabled,
+                enabled -> {
+                    cfg.chatCopyingEnabled = enabled;
+                    cfg.markDirty();
+                    screen.scheduleRebuild();
+                },
+                (x, y, w, h) -> new FeatureControlWidget(x, y, w, h, "chat_copying", screen::scheduleRebuild),
+                List.of()
+            ),
+            new GuiFeature(
                 "inventory_full_warning",
                 "acquiredutils.gui.setting.inventory_full_warning",
                 "acquiredutils.gui.desc.inventory_full_warning",

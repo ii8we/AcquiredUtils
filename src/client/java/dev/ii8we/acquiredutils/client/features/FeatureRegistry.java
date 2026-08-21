@@ -32,6 +32,7 @@ public final class FeatureRegistry {
             cfg.notificationPositionY = 0.25f;
         }));
         register(new ConfigFeature("rarity_highlight", () -> AcquiredUtilsConfig.get().rarityCircleEnabled, value -> AcquiredUtilsConfig.get().rarityCircleEnabled = value, () -> AcquiredUtilsConfig.get().rarityCircleEnabled = true));
+        register(new ConfigFeature("rarity_glint", () -> AcquiredUtilsConfig.get().rarityGlintEnabled, value -> AcquiredUtilsConfig.get().rarityGlintEnabled = value, () -> AcquiredUtilsConfig.get().rarityGlintEnabled = true));
         register(new ConfigFeature("slot_lock", () -> AcquiredUtilsConfig.get().slotLockEnabled, value -> {
             AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
             cfg.slotLockEnabled = value;
@@ -44,9 +45,23 @@ public final class FeatureRegistry {
             cfg.lockedSlots.clear();
         }));
         register(new ConfigFeature("inventory_search", () -> AcquiredUtilsConfig.get().inventorySearchEnabled, value -> AcquiredUtilsConfig.get().inventorySearchEnabled = value, () -> AcquiredUtilsConfig.get().inventorySearchEnabled = true));
+        register(new ConfigFeature("chat_combination", () -> AcquiredUtilsConfig.get().chatCombinationEnabled, value -> AcquiredUtilsConfig.get().chatCombinationEnabled = value, () -> AcquiredUtilsConfig.get().chatCombinationEnabled = true));
+        register(new ConfigFeature("chat_copying", () -> AcquiredUtilsConfig.get().chatCopyingEnabled, value -> AcquiredUtilsConfig.get().chatCopyingEnabled = value, () -> AcquiredUtilsConfig.get().chatCopyingEnabled = true));
         register(new ConfigFeature("inventory_full_warning", () -> AcquiredUtilsConfig.get().inventoryFullWarningEnabled, value -> AcquiredUtilsConfig.get().inventoryFullWarningEnabled = value, () -> AcquiredUtilsConfig.get().inventoryFullWarningEnabled = true));
         register(new ConfigFeature("gear_comparison", () -> AcquiredUtilsConfig.get().itemComparisonEnabled, value -> AcquiredUtilsConfig.get().itemComparisonEnabled = value, () -> AcquiredUtilsConfig.get().itemComparisonEnabled = true));
         register(new ConfigFeature("recipe_unlock_highlight", () -> AcquiredUtilsConfig.get().recipeUnlockHighlightEnabled, value -> AcquiredUtilsConfig.get().recipeUnlockHighlightEnabled = value, () -> AcquiredUtilsConfig.get().recipeUnlockHighlightEnabled = true));
+
+        // Performance feature toggle
+        register(new ConfigFeature("disable_glowing_effects", () -> AcquiredUtilsConfig.get().disableGlowingEffects, value -> AcquiredUtilsConfig.get().disableGlowingEffects = value, () -> AcquiredUtilsConfig.get().disableGlowingEffects = false));
+        register(new ConfigFeature("health_bar_overlay", () -> AcquiredUtilsConfig.get().healthBarOverlayEnabled, value -> AcquiredUtilsConfig.get().healthBarOverlayEnabled = value, () -> AcquiredUtilsConfig.get().healthBarOverlayEnabled = true));
+        register(new ConfigFeature("mana_bar_overlay", () -> AcquiredUtilsConfig.get().manaBarOverlayEnabled, value -> AcquiredUtilsConfig.get().manaBarOverlayEnabled = value, () -> AcquiredUtilsConfig.get().manaBarOverlayEnabled = true));
+        register(new ConfigFeature("player_abilities_panel", () -> AcquiredUtilsConfig.get().playerAbilitiesPanelEnabled, value -> AcquiredUtilsConfig.get().playerAbilitiesPanelEnabled = value, () -> {
+            AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
+            cfg.playerAbilitiesPanelEnabled = true;
+            cfg.playerAbilitiesPanelScale = 1.0f;
+            cfg.playerAbilitiesPanelPositionX = 0.72f;
+            cfg.playerAbilitiesPanelPositionY = 0.20f;
+        }));
     }
 
     public static void register(ClientFeature feature) {

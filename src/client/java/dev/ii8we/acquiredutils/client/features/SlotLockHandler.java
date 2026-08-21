@@ -15,13 +15,7 @@ import net.minecraft.client.input.KeyEvent;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.Slot;
 
-/**
- * Client-side protection for player inventory slots.
- *
- * This class intentionally uses only Fabric API screen events. No mixins are
- * required, and the implementation is written against Mojang mappings for
- * Minecraft 1.21.11.
- */
+/** Client-side protection for locked inventory slots. */
 public final class SlotLockHandler {
 
     private static final Identifier LOCK_TEXTURE =
@@ -39,20 +33,14 @@ public final class SlotLockHandler {
                 return;
             }
 
-            // Covers normal left/right/middle and extra mouse-button clicks.
             ScreenMouseEvents.allowMouseClick(screen).register((s, event) ->
                 allowMouseClick(containerScreen, event)
             );
 
-            // Covers click-drag / quick-craft interaction. A drag is rejected
-            // whenever its current slot is protected, so a locked slot cannot
-            // be filled, emptied, or included in a quick-craft operation.
             ScreenMouseEvents.allowMouseDrag(screen).register((s, event, deltaX, deltaY) ->
                 allowMouseDrag(containerScreen, event)
             );
 
-            // Do not suppress releases: Minecraft needs the release event to
-            // cleanly terminate an in-progress drag/quick-craft state.
             ScreenMouseEvents.allowMouseRelease(screen).register((s, event) -> true);
 
             ScreenKeyboardEvents.allowKeyPress(screen).register((s, event) ->
@@ -60,9 +48,7 @@ public final class SlotLockHandler {
             );
         });
 
-        // Protection for keyboard item-dropping while no container screen is open.
-        // Hotbar selection itself is deliberately NOT blocked: locking a slot is
-        // about protecting its contents, not preventing the player from holding it.
+        // Protect item-drop actions for locked slots.
         ClientTickEvents.START_CLIENT_TICK.register(client -> {
             if (!AcquiredUtilsConfig.get().slotLockEnabled) {
                 return;
@@ -116,8 +102,7 @@ public final class SlotLockHandler {
             return true;
         }
 
-        // The lock key itself is consumed by us so Minecraft does not also
-        // process it as an inventory action.
+        // Consume the lock key.
         if (keyCode == AcquiredUtilsConfig.get().slotLockKey) {
             toggleHoveredSlot(screen);
             return false;
