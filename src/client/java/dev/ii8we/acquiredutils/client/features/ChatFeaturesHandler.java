@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.ChatScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MessageSignature;
+
+import java.util.UUID;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -24,6 +26,7 @@ public final class ChatFeaturesHandler {
     private static String lastMessageText;
     private static int repeatCount;
     private static MessageSignature lastSignature;
+    private static UUID lastSenderId;
     private static boolean copyKeyWasDown;
 
     private ChatFeaturesHandler() {}
@@ -31,18 +34,27 @@ public final class ChatFeaturesHandler {
     public static void init() {
         ClientReceiveMessageEvents.ALLOW_CHAT.register((message, signedMessage, sender, boundType, receptionTime) -> {
             AcquiredUtilsConfig cfg = AcquiredUtilsConfig.get();
-            if (!cfg.chatCombinationEnabled) {
+            Minecraft client = Minecraft.getInstance();
+            String text = message.getString();
+            UUID senderId = sender == null ? null : sender.id();
+
+            if (!cfg.chatCombinationEnabled || signedMessage == null) {
                 lastOriginalMessage = message.copy();
-                lastMessageText = message.getString();
+                lastMessageText = text;
                 repeatCount = 1;
-                lastSignature = signedMessage.signature();
+                lastSignature = signedMessage == null ? null : signedMessage.signature();
+                lastSenderId = senderId;
                 return true;
             }
 
-            String text = message.getString();
-            Minecraft client = Minecraft.getInstance();
+            MessageSignature signature = signedMessage.signature();
+            boolean sameMessage = lastMessageText != null
+                && lastMessageText.equals(text)
+                && lastSignature != null
+                && lastSenderId != null
+                && lastSenderId.equals(senderId);
 
-            if (lastMessageText != null && lastMessageText.equals(text) && lastSignature != null) {
+            if (sameMessage) {
                 repeatCount++;
                 Component combined = lastOriginalMessage.copy()
                     .append(Component.literal(" (x" + repeatCount + ")"));
@@ -52,14 +64,17 @@ public final class ChatFeaturesHandler {
                 lastOriginalMessage = message.copy();
                 lastMessageText = text;
                 repeatCount = 1;
-                lastSignature = signedMessage.signature();
-                client.gui.getChat().addMessage(message, lastSignature, null);
+                lastSignature = signature;
+                lastSenderId = senderId;
+                client.gui.getChat().addMessage(message, signature, null);
             }
 
             return false;
         });
 
-        ClientReceiveMessageEvents.GAME.register((message, overlay) -> reset());
+        ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
+            if (!overlay) reset();
+        });
         ClientTickEvents.END_CLIENT_TICK.register(ChatFeaturesHandler::tickCopyShortcut);
     }
 
@@ -86,6 +101,7 @@ public final class ChatFeaturesHandler {
         lastMessageText = null;
         repeatCount = 0;
         lastSignature = null;
+        lastSenderId = null;
         copyKeyWasDown = false;
     }
 }

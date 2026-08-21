@@ -11,6 +11,8 @@ import net.minecraft.world.scores.PlayerScoreEntry;
 import net.minecraft.world.scores.PlayerTeam;
 import net.minecraft.world.scores.Scoreboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,19 +26,30 @@ public final class PlayerHudDataReader {
     private static int manaCurrent;
     private static int manaMax;
     private static Component lastOverlayMessage;
+    private static int overlayAgeTicks = Integer.MAX_VALUE;
     private static final Pattern HEALTH_PATTERN = Pattern.compile("(?i)(?:[♥❤]|health)[^0-9]*([0-9]+)\\s*/\\s*([0-9]+)");
     private static final Pattern MANA_PATTERN = Pattern.compile("(?i)focus\\s*:?\\s*([0-9]+)\\s*/\\s*([0-9]+)");
+    private static final Pattern PAIR_PATTERN = Pattern.compile("([0-9]+)\\s*/\\s*([0-9]+)");
 
     private PlayerHudDataReader() {}
 
     public static void init() {
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
-            if (overlay) {
-                lastOverlayMessage = message.copy();
-            }
+            if (!overlay) return;
+            lastOverlayMessage = message.copy();
+            overlayAgeTicks = 0;
+            readHealthAndMana(message.getString());
         });
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (client.player == null || client.level == null || client.getConnection() == null) {
+                resetHudValues();
+                return;
+            }
+            if (overlayAgeTicks < Integer.MAX_VALUE) {
+                overlayAgeTicks++;
+                if (overlayAgeTicks > 40) resetHudValues();
+            }
             if (++tickCounter < SCAN_INTERVAL_TICKS) return;
             tickCounter = 0;
             scan(client);
@@ -46,25 +59,8 @@ public final class PlayerHudDataReader {
     private static void scan(Minecraft client) {
         if (client.player == null || client.level == null || client.getConnection() == null) return;
 
-        readHealthAndMana(client);
-
         String detectedClass = detectClassFromSidebar(client);
-        String detectedPet = null;
-
-        for (PlayerInfo info : client.getConnection().getOnlinePlayers()) {
-            String display = info.getTabListDisplayName() == null ? "" : info.getTabListDisplayName().getString();
-            String profile = info.getProfile().name();
-
-            String combined = display + "\n" + profile;
-            for (String rawLine : combined.split("\\R")) {
-                String line = stripFormatting(rawLine).trim();
-                if (line.isEmpty()) continue;
-
-                String petValue = valueAfterLabel(line, "Pet");
-                if (petValue != null) detectedPet = petValue;
-
-            }
-        }
+        String detectedPet = detectPetFromTabList(client);
 
         if (detectedClass == null) {
             detectedClass = detectClassFromTabList(client);
@@ -91,33 +87,61 @@ public final class PlayerHudDataReader {
     }
 
 
-    private static void readHealthAndMana(Minecraft client) {
-        if (lastOverlayMessage == null) {
-            healthCurrent = healthMax = manaCurrent = manaMax = 0;
-            return;
+    private static void readHealthAndMana(String rawText) {
+        String text = stripFormatting(rawText).replaceAll("\\s+", " ").trim();
+        int newHealthCurrent = 0;
+        int newHealthMax = 0;
+        int newManaCurrent = 0;
+        int newManaMax = 0;
+
+        Matcher healthMatcher = HEALTH_PATTERN.matcher(text);
+        if (healthMatcher.find()) {
+            int current = parseInt(healthMatcher.group(1));
+            int max = parseInt(healthMatcher.group(2));
+            if (isValidPair(current, max)) {
+                newHealthCurrent = current;
+                newHealthMax = max;
+            }
         }
-        String text = stripFormatting(lastOverlayMessage.getString()).replaceAll("\\s+", " ").trim();
 
         Matcher manaMatcher = MANA_PATTERN.matcher(text);
         if (manaMatcher.find()) {
             int current = parseInt(manaMatcher.group(1));
             int max = parseInt(manaMatcher.group(2));
             if (isValidPair(current, max)) {
-                manaCurrent = current;
-                manaMax = max;
+                newManaCurrent = current;
+                newManaMax = max;
             }
         }
 
-        Matcher healthMatcher = HEALTH_PATTERN.matcher(text);
-        if (healthMatcher.find()) {
-            int current = parseInt(healthMatcher.group(1));
-            int max = parseInt(healthMatcher.group(2));
-            // The first current/max pair in this actionbar is the custom health value.
-            if (isValidPair(current, max)) {
-                healthCurrent = current;
-                healthMax = max;
-            }
+        List<int[]> pairs = new ArrayList<>();
+        Matcher pairMatcher = PAIR_PATTERN.matcher(text);
+        while (pairMatcher.find()) {
+            int current = parseInt(pairMatcher.group(1));
+            int max = parseInt(pairMatcher.group(2));
+            if (isValidPair(current, max)) pairs.add(new int[] {current, max});
         }
+
+        if (newHealthMax == 0 && !pairs.isEmpty()) {
+            newHealthCurrent = pairs.get(0)[0];
+            newHealthMax = pairs.get(0)[1];
+        }
+        if (newManaMax == 0 && pairs.size() > 1) {
+            int[] pair = pairs.get(pairs.size() > 2 && newHealthMax > 0 ? 1 : pairs.size() - 1);
+            newManaCurrent = pair[0];
+            newManaMax = pair[1];
+        }
+
+        healthCurrent = newHealthCurrent;
+        healthMax = newHealthMax;
+        manaCurrent = newManaCurrent;
+        manaMax = newManaMax;
+    }
+
+    private static void resetHudValues() {
+        lastOverlayMessage = null;
+        overlayAgeTicks = Integer.MAX_VALUE;
+        healthCurrent = healthMax = manaCurrent = manaMax = 0;
     }
 
     private static int parseInt(String value) {
@@ -164,21 +188,37 @@ public final class PlayerHudDataReader {
         return owner.getString();
     }
 
-    private static String detectClassFromTabList(Minecraft client) {
-        for (PlayerInfo info : client.getConnection().getOnlinePlayers()) {
-            String display = info.getTabListDisplayName() == null ? "" : info.getTabListDisplayName().getString();
-            String profile = info.getProfile().name();
-            String combined = display + "\n" + profile;
-            for (String rawLine : combined.split("\\R")) {
-                String line = stripFormatting(rawLine).trim();
-                if (line.isEmpty()) continue;
+    private static String detectPetFromTabList(Minecraft client) {
+        PlayerInfo info = client.getConnection().getPlayerInfo(client.player.getUUID());
+        if (info == null) return null;
 
-                String classValue = valueAfterLabel(line, "Class");
-                if (classValue == null) classValue = valueAfterLabel(line, "Profile");
-                if (PlayerClass.fromDisplayName(classValue) != null) {
-                    return PlayerClass.fromDisplayName(classValue).displayName();
-                }
-            }
+        String display = info.getTabListDisplayName() == null ? "" : info.getTabListDisplayName().getString();
+        String profile = info.getProfile().name();
+        String combined = display + "\n" + profile;
+        for (String rawLine : combined.split("\\R")) {
+            String line = stripFormatting(rawLine).trim();
+            if (line.isEmpty()) continue;
+            String petValue = valueAfterLabel(line, "Pet");
+            if (petValue != null) return petValue;
+        }
+        return null;
+    }
+
+    private static String detectClassFromTabList(Minecraft client) {
+        PlayerInfo info = client.getConnection().getPlayerInfo(client.player.getUUID());
+        if (info == null) return null;
+
+        String display = info.getTabListDisplayName() == null ? "" : info.getTabListDisplayName().getString();
+        String profile = info.getProfile().name();
+        String combined = display + "\n" + profile;
+        for (String rawLine : combined.split("\\R")) {
+            String line = stripFormatting(rawLine).trim();
+            if (line.isEmpty()) continue;
+
+            String classValue = valueAfterLabel(line, "Class");
+            if (classValue == null) classValue = valueAfterLabel(line, "Profile");
+            PlayerClass playerClass = PlayerClass.fromDisplayName(classValue);
+            if (playerClass != null) return playerClass.displayName();
         }
         return null;
     }

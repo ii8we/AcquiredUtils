@@ -564,21 +564,7 @@ public class AcquiredUtilsConfigScreen extends Screen {
         graphics.fill(panelX, panelY, panelX + panelWidth, panelY + panelHeight, 0x7A07030F);
         graphics.disableScissor();
 
-        int logoSize = Math.min(s(24), headerHeight - s(6));
-        int logoX = panelX + padding + s(3);
-        int logoY = panelY + (headerHeight - logoSize) / 2;
-
-        graphics.blit(
-            RenderPipelines.GUI_TEXTURED,
-            Identifier.fromNamespaceAndPath("acquiredutils", "textures/gui/icon_header.png"),
-            logoX,
-            logoY,
-            0.0f, 0.0f,
-            logoSize, logoSize,
-            32, 32
-        );
-
-        int titleX = logoX + logoSize + s(5);
+        int titleX = panelX + padding + s(3);
         int titleY = panelY + (headerHeight - this.font.lineHeight) / 2;
 
         Component titlePrefix = Component.literal("AcquiredUtils")

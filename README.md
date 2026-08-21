@@ -14,9 +14,27 @@
 
 ---
 
+## Features
+
+- Inventory Search
+- Chat Combination
+- Chat Copying
+- Inventory Full Warning
+- Slot Lock
+- Gear Comparison
+- Pickup Alerts
+- Held Item Position
+- Recipe Unlock Highlights
+- Rarity Highlight
+- Rarity Glint
+- Player Profile Panel
+- Health Bar
+- Mana Bar
+- Disable Glowing Effects
+
 ## Compatibility
 
-AcquiredUtils is developed without mixins to avoid conflicts with other mods that modify the same Minecraft classes. It relies on Fabric API events and supported APIs whenever possible to provide better compatibility with other mods.
+AcquiredUtils is a client-side Fabric mod for Minecraft 1.21.11. It uses Fabric API and Minecraft's supported client APIs wherever possible, with limited access to Minecraft internals where required by specific features.
 
 ## Installation
 
